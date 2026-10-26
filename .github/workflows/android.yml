@@ -81,6 +81,13 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: mvn -B test -Dsuite=${{ github.event.inputs.suite || 'testng.xml' }} > build.log 2>&1; s=$?; tail -n 60 build.log; exit $s
 
+      # Show the test totals on the run summary
+      - name: Report test totals
+        if: always()
+        run: |
+          line=$(grep -E "Tests run: [0-9]+, Failures" build.log 2>/dev/null | tail -1)
+          echo "::notice title=Android test totals::${line:-no test summary found}"
+
       # Surface failures as annotations on the run summary
       - name: Summarise failures
         if: failure()
