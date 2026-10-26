@@ -61,7 +61,9 @@ jobs:
 
       # Compile and download dependencies before the emulator boots, so its time is spent on tests
       - name: Compile tests
-        run: mvn -B -q test-compile
+        run: |
+          set -o pipefail
+          mvn -B test-compile 2>&1 | tee build.log
 
       - name: Start Appium server
         run: |
