@@ -4,6 +4,7 @@ import com.spandan.mobile.config.ConfigManager;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -69,6 +70,14 @@ public abstract class BasePage {
                         + ".scrollIntoView(new UiSelector().resourceId(\"" + PACKAGE + ":id/" + resourceId + "\"))"));
     }
 
+    /**
+     * Waits for a screen to load, then scrolls to the element. Use for elements that start below the fold,
+     * where a plain visibility wait would time out because the element is not on screen yet.
+     */
+    protected WebElement waitAndScrollTo(String resourceId) {
+        return wait.ignoring(NoSuchElementException.class).until(d -> scrollToId(resourceId));
+    }
+
     /** Scrolls to a field, then types into it. */
     protected void scrollAndType(String resourceId, String text) {
         WebElement field = scrollToId(resourceId);
@@ -79,7 +88,7 @@ public abstract class BasePage {
     /** Scrolls to a button, closes the keyboard if it covers it, then taps it. */
     protected void scrollAndTap(String resourceId) {
         hideKeyboard();
-        scrollToId(resourceId).click();
+        waitAndScrollTo(resourceId).click();
     }
 
     protected void hideKeyboard() {

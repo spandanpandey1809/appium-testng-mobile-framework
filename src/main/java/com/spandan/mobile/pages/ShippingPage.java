@@ -8,7 +8,7 @@ public class ShippingPage extends BasePage {
 
     public ShippingPage(AndroidDriver driver) {
         super(driver);
-        waitForVisible(id("fullNameET"));
+        waitAndScrollTo("fullNameET");
     }
 
     @Step("Enter shipping address for {fullName}")

@@ -8,7 +8,7 @@ public class PaymentPage extends BasePage {
 
     public PaymentPage(AndroidDriver driver) {
         super(driver);
-        waitForVisible(id("cardNumberET"));
+        waitAndScrollTo("cardNumberET");
     }
 
     @Step("Enter card details")
