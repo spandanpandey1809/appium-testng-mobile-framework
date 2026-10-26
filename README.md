@@ -1,6 +1,7 @@
 # Appium + TestNG Mobile Automation Framework
 
 ![Android Tests](https://github.com/spandanpandey1809/appium-testng-mobile-framework/actions/workflows/android.yml/badge.svg)
+[![Live report](https://img.shields.io/badge/Allure-live%20report-orange)](https://spandanpandey1809.github.io/appium-testng-mobile-framework/)
 
 Android app test automation in Java with **Appium 2 (UiAutomator2)**, TestNG and Allure. Every push runs the suite on an Android emulator in GitHub Actions.
 
@@ -11,7 +12,7 @@ Companion to my web/API framework: [restassured-selenium-testng-framework](https
 | Mobile automation | Appium 2, UiAutomator2 driver, Appium Java client 9 |
 | Test runner | TestNG: groups, data providers |
 | Design | Page Object Model, explicit waits, resource-id and accessibility-id locators |
-| Reporting | Allure with screenshot and UI hierarchy (page source) on failure |
+| Reporting | Allure with screenshot and UI hierarchy (page source) on failure, published to GitHub Pages |
 | CI/CD | GitHub Actions with a hardware-accelerated Android emulator (API 31) |
 | Build | Maven, Java 17 |
 
@@ -27,6 +28,10 @@ Companion to my web/API framework: [restassured-selenium-testng-framework](https
 | Catalog | Sort by price (low to high), scroll gesture to the last product |
 | Cart | Add a product (badge and cart count), add several units, remove the last item (empty cart) |
 | Checkout | Logged-out user: cart, log in at checkout, shipping address, card details, place order, confirmation |
+
+## Live report
+
+Every main-branch run publishes the Allure report to GitHub Pages: **[live test report](https://spandanpandey1809.github.io/appium-testng-mobile-framework/)**. Each CI run also shows the test totals on its summary page.
 
 ## How to run locally
 
