@@ -18,6 +18,11 @@ on:
           - testng.xml
           - smoke.xml
 
+# A newer push to the same branch cancels the older run, so the slow emulator job never runs twice for nothing
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   android:
     runs-on: ubuntu-latest
