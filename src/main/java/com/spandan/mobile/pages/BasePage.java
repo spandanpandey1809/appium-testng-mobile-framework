@@ -58,4 +58,35 @@ public abstract class BasePage {
     protected List<WebElement> findAll(By locator) {
         return driver.findElements(locator);
     }
+
+    /**
+     * Scrolls the screen's scrollable container until the element with this resource-id is on screen.
+     * Android only exposes on-screen views, so long forms need this before typing or tapping.
+     */
+    protected WebElement scrollToId(String resourceId) {
+        return driver.findElement(AppiumBy.androidUIAutomator(
+                "new UiScrollable(new UiSelector().scrollable(true).instance(0))"
+                        + ".scrollIntoView(new UiSelector().resourceId(\"" + PACKAGE + ":id/" + resourceId + "\"))"));
+    }
+
+    /** Scrolls to a field, then types into it. */
+    protected void scrollAndType(String resourceId, String text) {
+        WebElement field = scrollToId(resourceId);
+        field.clear();
+        field.sendKeys(text);
+    }
+
+    /** Scrolls to a button, closes the keyboard if it covers it, then taps it. */
+    protected void scrollAndTap(String resourceId) {
+        hideKeyboard();
+        scrollToId(resourceId).click();
+    }
+
+    protected void hideKeyboard() {
+        try {
+            driver.hideKeyboard();
+        } catch (RuntimeException ignored) {
+            // keyboard was not shown
+        }
+    }
 }

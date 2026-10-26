@@ -24,6 +24,9 @@ Companion to my web/API framework: [restassured-selenium-testng-framework](https
 | Area | Scenarios |
 | --- | --- |
 | Login | Valid login (menu then offers Log Out); empty username, empty password, locked-out user (data-driven) |
+| Catalog | Sort by price (low to high), scroll gesture to the last product |
+| Cart | Add a product (badge and cart count), add several units, remove the last item (empty cart) |
+| Checkout | Logged-out user: cart, log in at checkout, shipping address, card details, place order, confirmation |
 
 ## How to run locally
 
@@ -50,5 +53,6 @@ mvn allure:serve                         # open the report
 
 - **One Appium session per test class, fresh app per test:** starting a session on a phone is slow, so the session is reused and the app is killed and relaunched before every test. Tests stay independent without paying the session cost each time.
 - **Stable locators:** resource-id and accessibility id first; no XPath.
-- **Scrolling without coordinates:** menu items are found with `UiScrollable`, so tests work on any screen size.
+- **Scrolling without coordinates:** menu items, catalog products and long checkout forms are reached with `UiScrollable`, so tests work on any screen size. Android only exposes on-screen views, so every checkout field is scrolled into view before typing.
+- **Fluent checkout flow:** each page action returns the next page, so the whole checkout reads as one chain in the test.
 - **Failure evidence:** screenshot plus the screen's UI hierarchy attached to Allure, so a failure can be debugged without re-running it.

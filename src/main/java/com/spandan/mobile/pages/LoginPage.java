@@ -23,6 +23,13 @@ public class LoginPage extends BasePage {
         return new CatalogPage(driver).waitUntilLoaded();
     }
 
+    /** When login is triggered from checkout, the app continues to the shipping address screen. */
+    @Step("Log in as {username} to continue checkout")
+    public ShippingPage loginToCheckout(String username, String password) {
+        submit(username, password);
+        return new ShippingPage(driver);
+    }
+
     @Step("Submit credentials expecting an error")
     public LoginPage loginExpectingError(String username, String password) {
         submit(username, password);
@@ -40,12 +47,8 @@ public class LoginPage extends BasePage {
     private void submit(String username, String password) {
         type(usernameField, username);
         type(passwordField, password);
-        // The keyboard can cover the button on small screens; hiding it fails harmlessly if it isn't open
-        try {
-            driver.hideKeyboard();
-        } catch (RuntimeException ignored) {
-            // keyboard was not shown
-        }
+        // The keyboard can cover the button on small screens
+        hideKeyboard();
         tap(loginButton);
     }
 }
