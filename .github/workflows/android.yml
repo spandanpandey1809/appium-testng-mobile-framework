@@ -1,0 +1,99 @@
+name: Android Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: "45 3 * * *"   # every day at 09:15 IST
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: "Suite to run"
+        required: true
+        default: "testng.xml"
+        type: choice
+        options:
+          - testng.xml
+          - smoke.xml
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # Hardware acceleration makes the emulator usable on Linux runners
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Appium 2 and the UiAutomator2 driver
+        run: |
+          npm install -g appium@2.11.5
+          appium driver install uiautomator2@3.7.0
+
+      - name: Download the latest My Demo App APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download -R saucelabs/my-demo-app-android -p 'mda-[0-9]*.apk' -D apps
+          mv apps/mda-*.apk apps/mda.apk
+          ls -l apps
+
+      # Compile and download dependencies before the emulator boots, so its time is spent on tests
+      - name: Compile tests
+        run: mvn -B -q test-compile
+
+      - name: Start Appium server
+        run: |
+          nohup appium --log-timestamp > appium.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:4723/status && exit 0; sleep 2; done
+          echo "Appium did not start"; cat appium.log; exit 1
+
+      - name: Run tests on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: mvn -B test -Dsuite=${{ github.event.inputs.suite || 'testng.xml' }} > build.log 2>&1; s=$?; tail -n 60 build.log; exit $s
+
+      # Surface failures as annotations on the run summary
+      - name: Summarise failures
+        if: failure()
+        run: |
+          msg=$( (grep -E "\[ERROR\]|Tests run:|FAILED|Exception|expected" build.log 2>/dev/null | head -30; echo "--- appium.log errors ---"; grep -iE "error|fail" appium.log 2>/dev/null | tail -10) | cut -c1-300 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          echo "::error title=Android test failures::${msg}"
+
+      - name: Generate Allure report
+        if: always()
+        run: mvn -B allure:report
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: target/site/allure-maven-plugin
+          retention-days: 14

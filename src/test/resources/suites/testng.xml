@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!-- One emulator = one Appium session at a time, so classes run sequentially. -->
+<suite name="Android Regression">
+    <test name="Android">
+        <packages>
+            <package name="com.spandan.mobile.tests"/>
+        </packages>
+    </test>
+</suite>

@@ -1,0 +1,18 @@
+# Build output and reports
+target/
+allure-results/
+allure-report/
+test-output/
+
+# App binaries are downloaded, not committed
+apps/*.apk
+
+# Logs
+*.log
+
+# IDE / OS files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
