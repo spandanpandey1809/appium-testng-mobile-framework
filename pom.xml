@@ -24,6 +24,23 @@
         <suite>testng.xml</suite>
     </properties>
 
+    <!--
+        The Appium client declares Selenium as a version RANGE, so Maven picks the newest Selenium,
+        which removed interfaces this client still uses (ContextAware, html5.LocationContext).
+        Pin every Selenium module to the version java-client 9.3.0 was built against.
+    -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.seleniumhq.selenium</groupId>
+                <artifactId>selenium-bom</artifactId>
+                <version>4.23.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- Appium Java client (brings Selenium WebDriver) -->
         <dependency>
